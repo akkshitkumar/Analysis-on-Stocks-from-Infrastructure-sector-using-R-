@@ -1,0 +1,469 @@
+Companies Selected:
+
+•	We selected 4 companies from Infrastructure Sector (i.e., 1 per person) for stock analysis in this project:
+o	L&T
+o	GMR Infra
+o	Adani Ports
+o	Dilip Buildcon Ltd
+
+Steps
+•	Data Extraction
+•	Web scrapping
+•	Linear Regression
+•	Analysis & interpretation of Linear Regression & Correlation 
+•	Data Visualization
+
+ 
+Important Libraries Used:
+
+•	library(dplyr): dplyr is a powerful R-package to transform and summarize tabular data with rows and columns. The package contains a set of functions (or “verbs”) that perform common data manipulation operations such as filtering for rows, selecting specific columns, re-ordering rows, adding new columns and summarizing data.
+
+•	library(ggplot2): ggplot2 is a system for declaratively creating graphics, based on The Grammar of Graphics. You provide the data, tell ggplot2 how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details.
+
+•	library(lubridate): Lubridate is an R package that makes it easier to work with dates and times.
+
+•	library(rvest): rvest is new package that makes it easy to scrape (or harvest) data from html web pages, inspired by libraries like beautiful soup. It is designed to work with magrittr so that you can express complex operations as elegant pipelines composed of simple, easily understood pieces.
+
+•	library(pdfetch): An R package for downloading economic and financial time series from public sources.
+
+•	library(tidyverse): The tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures.
+
+•	library(MASS): Functions and datasets to support Venables and Ripley, ``Modern Applied Statistics with S'' (4th edition, 2002). Required library to ship dataset
+
+•	library(reshape2): Required for melt() and cast() function. Flexibly restructure and aggregate data using just two functions: melt and 'dcast' (or 'acast').
+
+
+
+ 
+1.Scrap and Load STOCKS data in RStudio using appropriate functions and tools.
+
+library(pdfetch)
+library(tidyverse)
+library(lubridate)
+library(MASS)
+library(reshape2)
+library(reshape)
+
+LT=pdfetch_YAHOO("LT.NS", fields = c("open", "high", "low", "close","volume"), from = as.Date("2021-08-01"), to = as.Date("2021-10-31"), interval = "1d")
+require(data.table)
+LT = as.data.table(LT)
+names(LT)=c("Date", "Stock open Price", "day high", "day low",
+            "stock close Price","volume") 
+write.csv(LT, "L&T.csv", row.names=FALSE)
+LT=read.table(file.choose(),header=TRUE,sep=",")
+LT$Date<- as.Date(LT$Date)
+LT= as.data.frame(LT)
+---------------------------------------------------------
+Company1 = pdfetch::pdfetch_YAHOO("ADANIPORTS.NS")
+require(data.table)
+Adani_ports = as.data.table(Company1)
+names(Adani_ports)=c("Date", "Stock open Price", "day high", "day low",
+                  "stock close Price","adj_close", "volume") 
+Adani_ports = as.data.frame(Adani_ports)
+final_Adani_ports=Adani_ports[Adani_ports$Date>="2021-08-01" & Adani_ports$Date<="2021-10-31",c(1:5,7)]
+---------------------------------------------------------
+  Company2 = pdfetch::pdfetch_YAHOO("GMRINFRA.NS")
+require(data.table)
+GMRINFRA = as.data.table(Company2)
+names(GMRINFRA)=c("Date", "Stock open Price", "day high", "day low",
+                     "stock close Price","adj_close", "volume") 
+GMRINFRA = as.data.frame(GMRINFRA)
+final_GMRINFRA=GMRINFRA[GMRINFRA$Date>="2021-08-01" & GMRINFRA$Date<="2021-10-31",c(1:5,7)]Company1 = pdfetch::pdfetch_YAHOO("ADANIPORTS.NS")
+---------------------------------------------------------
+DBL=pdfetch_YAHOO("DBL.NS", fields = c("open", "high", "low", "close","volume"), from = as.Date("2021-08-01"), to = as.Date("2021-10-31"), interval = "1d")
+require(data.table)
+DBL = as.data.table(DBL)
+names(DBL)=c("Date", "Stock open Price", "day high", "day low",
+             "stock close Price","volume") 
+write.csv(DBL, "DBL.csv", row.names=FALSE)  
+DBL=read.table(file.choose(),header=TRUE,sep=",")  
+DBL$Date<- as.Date(DBL$Date)
+DBL= as.data.frame(DBL)
+
+--------------------------------------------
+final_Adani_ports$Companyname="Adani Ports"
+LT$Companyname="Larsen & Toubro"
+final_GMRINFRA$Companyname="GMRINFRA"
+DBL$Companyname="Dilip Buildcon"
+
+
+•	Using this part of the code we were able to extract the stock details in the R Studio on which we were able perform all the required functions.
+
+
+2. Summary of different variables for the data collected for each company
+
+Summary Function: The summary is a built-in R function used to produce result summaries of various model fitting functions. The summary() function implores specific methods that depend on the class of the first argument.
+
+Code Used:
+summary(final_Adani_ports)
+summary(LT)
+summary(GMRINFRA)
+summary(DBL)
+
+
+ 
+3. Plot line charts for each variable and for each company separately.
+Codes Used:
+library(ggplot2)
+ggplot(LT) +
+  aes(x = Date, y = Open) +
+  geom_line(colour = "#FFC64D") +
+  labs(x = "DATE (MONTH)", 
+       y = "OPEN PRICE (RS.)", title = "L&T LINE CHART OF SHARE OPEN PRICE AND DATE ") +
+  theme_gray()+geom_point()
+
+
+ggplot(LT) +
+  aes(x = Date, y = Close) +
+  geom_line(colour = "#FFC64D") +
+  labs(x = "DATE (MONTH)", 
+       y = "CLOSE PRICE (RS.)", title = "L&T LINE CHART OF SHARE CLOSE PRICE AND DATE ") +
+  theme_gray()+geom_point()
+
+
+ggplot(LT) +
+  aes(x = Date, y = Low) +
+  geom_line(colour = "#FFC64D") +
+  labs(x = "DATE (MONTH)", 
+       y = "LOW PRICE (RS.)", title = "L&T LINE CHART OF SHARE LOW PRICE AND DATE ") +
+  theme_gray()+geom_point()
+
+ggplot(LT) +
+  aes(x = Date, y = High) +
+  geom_line(colour = "#FFC64D") +
+  labs(x = "DATE (MONTH)", 
+       y = "HIGH PRICE (RS.)", title = "L&T LINE CHART OF SHARE HIGH PRICE AND DATE ") +
+  theme_gray()+geom_point()
+
+
+ggplot(LT) +
+  aes(x = Date, y = Volume) +
+  geom_line(colour = "#FFC64D") +
+  labs(x = "DATE (MONTH)", 
+       y = "VOLUME TRADED (QTY)", title = "L&T LINE CHART OF SHARE VOLUME TRADED AND DATE ") +
+  theme_gray()+geom_point()
+-----------------------------------------------
+plot(final_Adani_ports$Date, final_Adani_ports$`Stock open Price`, type="l" )
+plot(final_Adani_ports$Date, final_Adani_ports$`day high`, type="l" )
+plot(final_Adani_ports$Date, final_Adani_ports$`day low`, type="l" )
+plot(final_Adani_ports$Date, final_Adani_ports$`stock close Price`, type="l" )
+plot(final_Adani_ports$Date, final_Adani_ports$`volume`, type="l" )
+
+
+
+4. Then combine the data and generate line charts using the following criteria:
+a)	For each variable, faceted by company
+complete_Companydata=as.data.frame(rbind(final_Adani_ports, LT,
+                                           final_GMRINFRA, DBL))
+
+library(tidyverse)
+
+ggplot(data= complete_Companydata,aes(x=Date,y=`Stock open Price`, col= Companyname, )) +
+  geom_line(size = 1) + scale_color_hue(direction = 1) +
+  geom_point(size=1, colour="#000000")+labs(x = "Date (Month)", y = "Stock Open Price (Rs)") +
+facet_grid(~Companyname) + theme_gray() +  facet_wrap(vars(Companyname), ncol = 2L) 
+
+ggplot(data= complete_Companydata,aes(x=Date,y=`day high`, col= Companyname, )) +
+  geom_line(size = 1) +scale_color_hue(direction = 1) +
+  geom_point(size=1, colour="#000000")+labs(x = "Date (Month)", y = "Stock close Price (Rs)") +
+facet_grid(~Companyname) + theme_gray() + facet_wrap(vars(Companyname), ncol = 2L)  
+
+ggplot(data= complete_Companydata,aes(x=Date,y=`day low`, col= Companyname, )) +
+  geom_line(size = 1) + scale_color_hue(direction = 1) +
+  geom_point(size=1, colour="#000000")+labs(x = "Date (Month)", y = "day high (Rs)") +
+facet_grid(~Companyname) + theme_gray() + facet_wrap(vars(Companyname), ncol = 2L)  
+
+ggplot(data= complete_Companydata,aes(x=Date,y=`stock close Price`, col= Companyname, )) +
+  geom_line(size = 1) + scale_color_hue(direction = 1) +
+  geom_point(size=1, colour="#000000")+labs(x = "Date (Month)", y = "day low (Rs)") +
+facet_grid(~Companyname) + theme_gray() + facet_wrap(vars(Companyname), ncol = 2L)  
+
+ggplot(data= complete_Companydata,aes(x=Date,y=`volume`, col= Companyname, )) +
+  geom_line(size = 1) + scale_color_hue(direction = 1) +
+  geom_point(size=1, colour="#000000")+labs(x = "Date (Month)", y = "volume (Rs)") +
+  facet_grid(~Companyname) + theme_gray() + facet_wrap(vars(Companyname), ncol = 2L)
+ 
+
+b) For each company, faceted by variable
+LT1=melt(LT[1:6] ,id="Date")
+LT1$Date=as.Date(LT1$Date)
+View(LT1)
+str(LT1)
+
+ggplot(LT1) +
+  aes(x = Date, y = value) +
+  geom_line(size = 0.5, colour = "#FFC64D") +
+  labs(x = "DATE (MONTH)", 
+       y = "VALUE", title = "LINE CHART FOR L&T FACETED BY VARIABLE") +
+  theme_minimal() +
+  facet_wrap(vars(variable), scales = "free_y")
+------------------------------------------------------ 
+
+GMR_Final=melt(final_GMRINFRA ,id="Date")
+View(GMR_Final)
+
+ggplot(GMR_Final) +
+  aes(x = Date, y = value, colour = variable) +
+  geom_line(size = 0.5) +
+  scale_color_hue(1) +
+  theme_minimal() +
+  facet_wrap(vars(variable),scales = "free_y")
+  ------------------------------------------------------
+  library(MASS)
+library(reshape2) 
+library(reshape)
+---------------------------------------------------------------------
+final_Adani_ports1=melt(final_Adani_ports[1:6] ,id="Date")
+final_Adani_ports1$Date=as.Date(final_Adani_ports$Date)
+
+
+ggplot(final_Adani_ports1) +
+  aes(x = Date, y = value) +
+  geom_line(size = 0.5, colour = "#FFC64D") +
+  labs(x = "DATE (MONTH)", 
+       y = "VALUE", title = "LINE CHART FOR Adani_Port FACETED BY VARIABLE") +
+  theme_minimal() +
+facet_wrap(vars(variable), scales = "free_y")
+
+
+
+5. Compute correlations between date and each of the variables for each of the selected companies.
+Correlation is a statistical measure that expresses the extent to which two variables are linearly related (meaning they change together at a constant rate). It’s a common tool for describing simple relationships without making a statement about cause and effect.
+the correlation coefficient which ranges from -1 to +1 and is denoted by r .The closer r is to zero, the weaker the linear relationship. Positive r values indicate a positive correlation, where the values of both variables tend to increase together. Negative r values indicate a negative correlation, where the values of one variable tend to increase when the values of the other variable decrease.
+
+
+CODE USED:
+#Correlation Between Date and other Variables 
+x=LT$Date
+y=LT$Open
+cor(y,x)
+
+y1=LT$High
+cor(y1,x)
+
+y2=LT$Low
+cor(y2,x)
+
+y3=LT$Close
+cor(y3,x)
+
+y4=LT$Volume
+cor(y4,x)
+
+cor(GMRINFRA$Date,GMRINFRA$`Opening Price`)
+cor(GMRINFRA$Date, GMRINFRA$`Highest Price`)
+cor(GMRINFRA$Date,GMRINFRA$`Lowest Price`)
+cor(GMRINFRA$Date, GMRINFRA$`Closing Price`)
+cor(GMRINFRA$Date, GMRINFRA$`Volume Traded`)
+
+final_Adani_ports$Date1= as.numeric(final_Adani_ports$Date)
+cor(final_Adani_ports$Date1,final_Adani_ports$`Stock open Price`)
+cor(final_Adani_ports$Date1,final_Adani_ports$`day high`)
+cor(final_Adani_ports$Date1,final_Adani_ports$`day low`)
+cor(final_Adani_ports$Date1,final_Adani_ports$`stock close Price`)
+cor(final_Adani_ports$Date1,final_Adani_ports$volume)
+ 
+6. Compute correlations for different combination of variables for which data has been collected.
+Code Used:
+#Correlation With different Variables
+cor(final_Adani_ports[2:5])
+cor(final_GMRINFRA[2:5])
+cor(LT[2:5])
+cor(DBL[2:5])
+
+
+WebScrapping:-
+Steps to be followed:-
+ 
+7. Lookout for news about the companies selected in the past six months:
+By using the steps mentioned above we can extract the news from Various websites and can store it in form of a database or a CSV file which can be used for further processes.
+Code:
+ link = "https://www.business-standard.com/company/adani-ports-21281/news"
+page = read_html(link)
+
+Date = page %>% html_nodes("h2+ p") %>% html_text()
+News = page %>% html_nodes("h2 a") %>% html_text()
+
+
+news_data = data.frame(Date, News, stringAsFactors = FALSE)
+
+write.csv(news_data, "adani_news.csv")
+----------------------------------------------------------------------------------------------
+url="https://www.business-standard.com/company/larsen-toubro-348/news/1"
+page1=read_html(url)
+page1
+news1=page1%>%html_nodes(".company-news-listing-txt h2")%>%html_text()
+news1
+date1=page1%>%html_nodes("h2+ p")%>%html_text()
+date1
+df=data.frame(date1,news1)
+View(df)
+colnames(df)<-c("date","news")
+
+url2="https://www.business-standard.com/company/m-m-365/news/2"
+page2=read_html(url2)
+page2
+news2=page2%>%html_nodes(".company-news-listing-txt h2")%>%html_text()
+news2
+date2=page2%>%html_nodes("h2+ p")%>%html_text()
+date2
+df2=data.frame(date2,news2)
+View(df2)
+colnames(df2)<-c("date","news")
+
+
+dfmodel<-rbind(df,df2)                                                              
+View(dfmodel)
+
+
+write.csv(dfmodel,"LTnews.csv")  
+
+------------------------------------------------------------------------------------
+url="https://economictimes.indiatimes.com/topic/gmr-infra"
+page1=read_html(url)
+page1
+news1=page1%>%html_nodes("#pageContent h2")%>%html_text()
+news1
+date1=page1%>%html_nodes("time")%>%html_text()
+date1
+GI=data.frame(date1,news1)
+View(GI)
+colnames(GI)<-c("date","news")        
+url="https://economictimes.indiatimes.com/dilip-buildcon-ltd/stocksupdate/companyid-49439.cms"
+page1=read_html(url)
+page1
+news1=page1%>%html_nodes(".headingText a ")%>%html_text()
+news1
+date1=page1%>%html_nodes("time")%>%html_text()
+date1
+df=data.frame(date1,news1)
+View(df)
+colnames(df)<-c("date","news")
+write.csv(df,"Dpnews.csv")      
+     
+
+8. Adding numeric value to the news category +1 for positive news, 0 for neutral news, -1 for negative news.
+LT_news$Category_Value <- ifelse(LT_news$Category=="Positive",+1,ifelse(LT_news$Category=="Negative",-1,0))
+LT_news$Date<- as.Date(LT_news$Date)
+DPL_news$Category_Value <- ifelse(DPL_news$Category=="Positive",+1,ifelse(DPL_news$Category=="Negative",-1,0))     
+DPL_news $Date<- as.Date(DPL_news $Date)                              
+Adani_port_news$Category_Value <- ifelse(Adani_port_news$Category=="Positive",+1,ifelse(Adani_port_news$Category=="Negative",-1,0))    
+Adani_port_news $Date<- as.Date(Adani_port_news$Date)                               
+GMRINFRA_news$Category_Value <- ifelse(GMRINFRA_news$Category=="Positive",+1,ifelse(GMRINFRA_news$Category=="Negative",-1,0))      
+GMRINFRA_news $Date<- as.Date(GMRINFRA_news $Date)  
+       
+
+9. Create a data frame to map the ‘Category’ attribute defined above with average stockprice (average of opening and closing stock prices) for those specific dates.     
+(A)
+final_Adani_ports$Average_stockPrice = (final_Adani_ports$`Stock open Price`+final_Adani_ports$`stock close Price`)/2
+LT$Average_stockPrice = (LT$`Stock open Price`+LT$`stock close Price`)/2
+DBL$Average_stockPrice = (DBL$`Stock open Price`+DBL$`stock close Price`)/2
+final_GMRINFRA$Average_stockPrice = (final_GMRINFRA$`Stock open Price`+final_GMRINFRA$`stock close Price`)/2                
+  
+                                              
+                                                                                                                                                                           
+Adani_port_news$Date=as.Date( Adani_port_news$Date, format = "%d-%m-%y")
+FullCompany_data1= merge(x=final_Adani_ports,y=Adani_port_news, by="Date", how= "left", all.x = TRUE)
+
+
+    
+Adani_port_news$Date=as.Date( Adani_port_news$Date, format = "%d-%m-%y")
+FullCompany_data1= merge(x=final_Adani_ports,y=Adani_port_news, by="Date", how= "left", all.x = TRUE)
+Adani_port_news$Date=as.Date( Adani_port_news$Date, format = "%d-%m-%y")
+FullCompany_data1= merge(x=final_Adani_ports,y=Adani_port_news, by="Date", how= "left", all.x = TRUE)
+Adani_port_news$Date=as.Date( Adani_port_news$Date, format = "%d-%m-%y")
+FullCompany_data1= merge(x=final_Adani_ports,y=Adani_port_news, by="Date", how= "left", all.x = TRUE)
+ 
+
+(B)
+FullCompany_data1=FullCompany_data1 %>% fill(Category_Value, .direction = "downup")
+View(FullCompany_data1)
+      
+FullCompany_data2=FullCompany_data2 %>% fill(Category_value, .direction = "downup")
+FullCompany_data2=FullCompany_data3 %>% fill(Category_value, .direction = "downup")
+FullCompany_data2=FullCompany_data4 %>% fill(Category_value, .direction = "downup")
+
+
+
+10. Carried out linear regression for each of the companies 
+
+Companymodel1=lm(FullCompany_data1$Average_stockPrice~FullCompany_data1$Category_value)
+
+eqn y=mx+c
+Average_StockPrice= -17.68*Category_Value+741.63
+
+summary(Companymodel1)
+
+Companymodel2=lm(FullCompany_data2$Average_stockPrice~FullCompany_data2$Category_value)
+summary(Companymodel2)
+ 
+Companymodel3=lm(FullCompany_data3$Average_stockPrice~FullCompany_data3$Category_value)
+summary(Companymodel3)
+
+
+Companymodel4=lm(FullCompany_data4$Average_stockPrice~FullCompany_data4$Category_value)
+summary(Companymodel4)
+
+
+11. Created a scatter plot for the combined data for each of the given companies 
+
+ggplot(FullCompany_data1) + aes(x = Category_Value, y = Average_stockPrice) +
+  labs(title = "Scatter Plot Between Category & Avg. Price")+ geom_point(shape = "triangle", size = 1.5, colour = "blue") + theme_light()
+
+
+ggplot(FullCompany_data2) + aes(x = Category_Value, y = Average_stockPrice) +
+  labs(title = "Scatter Plot Between Category & Avg. Price")+ geom_point(shape = "triangle", size = 1.5, colour = "blue") + theme_light()
+ 
+
+ggplot(FullCompany_data2) + aes(x = Category_Value, y = Average_stockPrice) +
+  labs(title = "Scatter Plot Between Category & Avg. Price")+ geom_point(shape = "triangle", size = 1.5, colour = "blue") + theme_light()
+
+ 
+
+ggplot(FullCompany_data3) + aes(x = Category_Value, y = Average_stockPrice) +
+  labs(title = "Scatter Plot Between Category & Avg. Price")+ geom_point(shape = "triangle", size = 1.5, colour = "blue") + theme_light()
+ 
+
+
+12. 
+(A) Carry out linear regression for Average stock prices, taking two companies at a time 
+
+v1= rbind(FullCompany_data1, FullCompany_data2)
+v2= rbind(FullCompany_data1, FullCompany_data3)
+ 
+v3= rbind(FullCompany_data1, FullCompany_data4)
+v4= rbind(FullCompany_data2, FullCompany_data3)
+v5= rbind(FullCompany_data2, FullCompany_data4)
+v6= rbind(FullCompany_data3, FullCompany_data4)
+
+
+model1=lm(v1$Average_stockPrice~ v1$Category_Value)
+model2=lm(v2$Average_stockPrice~ v2$Category_Value)
+model2
+summary(model2)
+ 
+model3=lm(v3$Average_stockPrice~ v3$Category_value)
+model4=lm(v4$Average_stockPrice~ v4$Category_value)
+model5=lm(v5$Average_stockPrice~ v5$Category_value)
+model6=lm(v6$Average_stockPrice~ v6$Category_value)
+
+
+(B) Carry out linear regression for Volume traded, taking two companies at a time 
+
+model7=lm(v1$volume~ v1$Average_stockPrice+v1$Category_value)
+model8=lm(v2$volume~ v2$Average_stockPrice+v2$Category_Value)
+model8
+summary(model8)
+ 
+
+model9=lm(v3$volume~ v3$Average_stockPrice+v3$Category_value)
+model10=lm(v4$volume~ v4$Average_stockPrice+v4$Category_value)
+model11=lm(v5$volume~ v5$Average_stockPrice+v5$Category_value)
+model12=lm(v6$volume~ v6$Average_stockPrice+v6$Category_value)
+
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                                                                                                                                                                                                                                                               
+
